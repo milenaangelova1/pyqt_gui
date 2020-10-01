@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QPixmap, QFont
-from PyQt5.QtWidgets import QWidget, QApplication, QLabel
+from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QLineEdit, QPushButton, QMessageBox
 import sys
 
 
@@ -29,11 +29,11 @@ class Registration(QWidget):
         except FileNotFoundError:
             print("Image not found.")
 
-        widget_labels = [
-            ("create new account", 110, 20, 'Arial', 20),
-            ("username:", 50, 180, 'Arial', 17),
-            ("full name", 50, 240, 'Arial', 17)
-        ]
+        # widget_labels = [
+        #     ("create new account", 110, 20, 'Arial', 20),
+        #     ("username:", 50, 180, 'Arial', 17),
+        #     ("full name", 50, 240, 'Arial', 17)
+        # ]
 
         sign_up_label = QLabel("create new account", self)
         sign_up_label.move(110, 20)
@@ -52,14 +52,49 @@ class Registration(QWidget):
         confirm_label.move(50, 270)
 
         # text fields - QLineEdit
-        # button - QPushButton
+        # username
+        self.name_entry = QLineEdit(self)
+        self.name_entry.move(130, 180)
+        self.name_entry.resize(200, 20)
+
+        # full name
+        name_entry = QLineEdit(self)
+        name_entry.move(130, 210)
+        name_entry.resize(200, 20)
+
+        self.pswd_entry = QLineEdit(self)
+        self.pswd_entry.setEchoMode(QLineEdit.Password)
+        self.pswd_entry.move(130, 240)
+        self.pswd_entry.resize(200, 20)
+
+        self.confirm_entry = QLineEdit(self)
+        self.confirm_entry.setEchoMode(QLineEdit.Password)
+        self.confirm_entry.move(130, 270)
+        self.confirm_entry.resize(200, 20)
+
+        # create a sign up button
+        sign_up_button = QPushButton("sign up", self)
+        sign_up_button.move(100, 310)
+        sign_up_button.resize(200, 40)
+        sign_up_button.clicked.connect(self.confirm_sign_up)
 
     def confirm_sign_up(self):
         """
         When user presses sign up, check if the password match.
         If the match, then save username and password text to users.txt
         """
-        pass
+        pswd_text = self.pswd_entry.text()
+        confirm_text = self.confirm_entry.text()
+
+        if pswd_text != confirm_text:
+            # Display messageBox id passwords don't match
+            QMessageBox.warning(self, "Error Message", "The passwords you entered do not match."
+                                "Please try again", QMessageBox.Close, QMessageBox.Close)
+        else:
+            with open("files/users.txt", "a+") as f:
+                f.write(self.name_entry.text() + " ")
+                f.write(pswd_text + "\n")
+            self.close()
 
 
 if __name__ == '__main__':
