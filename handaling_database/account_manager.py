@@ -2,7 +2,7 @@ import sys, os
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtSql import QSqlDatabase, QSqlRelationalTableModel, QSqlRelation, QSqlRelationalDelegate
+from PyQt5.QtSql import QSqlDatabase, QSqlRelationalTableModel, QSqlRelation, QSqlRelationalDelegate, QSqlQuery
 from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox, QLabel, QSizePolicy, QPushButton, QComboBox, \
     QHBoxLayout, QTableView, QHeaderView, QVBoxLayout
 
@@ -114,13 +114,48 @@ class AccountManager(QWidget):
         self.setLayout(main_v_box)
 
     def addItem(self):
-        pass
+        """
+        Add a new record to the last row of the table.
+        """
+        last_row = self.model.rowCount()
+        self.model.insertRow(last_row)
+
+        id = 0
+        query = QSqlQuery()
+        query.exec_("SELECT MAX(id) FROM ACCOUNTS")
+        if query.next():
+            print(query.value(0))
+            id = int(query.value(0))
 
     def deleteItem(self):
-        pass
+        """
+        Delete an entire row from the table.
+        """
+        current_item = self.table_view.selectedIndexes()
+        for index in current_item:
+            self.model.removeRow(index.row())
+        self.model.select()
 
-    def setSortingOrder(self):
-        pass
+    def setSortingOrder(self, text):
+        """
+        Sort the rows in table.
+        """
+        # mode = 0
+        if text == "Sort by ID":
+            self.model.setSort(self.model.fieldIndex('id'), Qt.AscendingOrder)
+            # self.model.setSort(self.model.fieldIndex('id'), mode if Qt.DescendingOrder else Qt.AscendingOrder)
+        elif text == "Sort by Employee ID":
+            self.model.setSort(self.model.fieldIndex('employee_id'), Qt.AscendingOrder)
+        elif text == "Sort by First Name":
+            self.model.setSort(self.model.fieldIndex('first_name'), Qt.AscendingOrder)
+        elif text == "Sort by Last Name":
+            self.model.setSort(self.model.fieldIndex('last_name'), Qt.AscendingOrder)
+        elif text == "Sort by Department":
+            self.model.setSort(self.model.fieldIndex('department'), Qt.AscendingOrder)
+        elif text == "Sort by Country":
+            self.model.setSort(self.model.fieldIndex('country'), Qt.AscendingOrder)
+
+        self.model.select()
 
 
 if __name__ == '__main__':
